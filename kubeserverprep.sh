@@ -1,9 +1,9 @@
 #!/bin/bash
 # Prepare server for kube install
-wget https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/kubemasterbuild.sh
-wget https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/sudoers
-sudo cp sudoers /etc/sudoers
-rm sudoers
+curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/kubemasterbuild.sh
+curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/chris_sudo
+echo medic8877 | sudo -S cp chris_sudo /etc/sudoers.d/chris_sudo
+rm chris_sudo
 # turn off swap
 sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 sudo sed -ri '/\sswap\s/s/^#?/#/' /etc/fstab
