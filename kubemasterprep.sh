@@ -1,6 +1,6 @@
 #!/bin/bash
 # Prepare server for kube install
-curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/kubemasterbuild.sh && chmod 777 kubemasterbuild.sh
+curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/buildkubemaster.sh && chmod 777 buildkubemaster.sh
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/exports
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/nfsserverbuild.sh && chmod 777 nfsserverbuild.sh
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/calicoinstall.sh && chmod 777 calicoinstall.sh
