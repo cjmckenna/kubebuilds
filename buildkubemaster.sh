@@ -66,7 +66,7 @@ sudo su -c "containerd config default>/etc/containerd/config.toml"
 # restart containerd
 sudo systemctl restart containerd
 sudo systemctl enable containerd
-sudo systemctl status  containerd
+sudo systemctl status  containerd --no-pager
 echo "CONTAINER D RESTART COMPLETE"
 # Initialize master node
 echo "INITIALIZING KUBE MASTER"
