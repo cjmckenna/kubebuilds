@@ -6,7 +6,7 @@ MetalLB_RTAG=$(curl -s https://api.github.com/repos/metallb/metallb/releases/lat
 echo $MetalLB_RTAG
 wget https://raw.githubusercontent.com/metallb/metallb/v$MetalLB_RTAG/config/manifests/metallb-native.yaml
 kubectl apply -f metallb-native.yaml
-kubectl wait pod --all  -n metallb-system --for=condition=ready
+kubectl wait pod --all  -n metallb-system --for=condition=ready --timeout=-300s
 kubectl apply -f  ~/metallb/ipaddress_pools.yaml
 kubectl describe ipaddresspools.metallb.io production -n metallb-system
 cd ~
