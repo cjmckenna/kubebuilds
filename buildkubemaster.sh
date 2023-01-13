@@ -87,4 +87,4 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl cluster-info
 
 bash calicoinstall.sh
-bash metalLBinstall.sh
+# bash metalLBinstall.sh
