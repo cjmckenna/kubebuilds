@@ -71,4 +71,4 @@ sudo su -c "containerd config default>/etc/containerd/config.toml"
 # restart containerd
 sudo systemctl restart containerd
 sudo systemctl enable containerd
-sudo systemctl status  containerd
+sudo systemctl status  containerd --no-pager
