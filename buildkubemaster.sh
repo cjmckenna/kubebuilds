@@ -54,11 +54,11 @@ sudo apt install -y curl gnupg2 software-properties-common apt-transport-https c
 # Add Docker repo
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-
+echo "INSTALLING CONTAINER D"
 # Install containerd
 sudo apt update
 sudo apt install -y containerd.io
-
+echo "CONTAINERD INSTALL COMPLETE"
 # Configure containerd and start service
 sudo su -c "mkdir -p /etc/containerd"
 sudo su -c "containerd config default>/etc/containerd/config.toml"
@@ -67,9 +67,9 @@ sudo su -c "containerd config default>/etc/containerd/config.toml"
 sudo systemctl restart containerd
 sudo systemctl enable containerd
 sudo systemctl status  containerd
-
+echo "CONTAINER D RESTART COMPLETE"
 # Initialize master node
-
+echo "INITIALIZING KUBE MASTER"
 lsmod | grep br_netfilter
 
 sudo systemctl enable kubelet
