@@ -86,16 +86,5 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl cluster-info
 
-kubeadm token create --print-join-command > joincommand.txt
-
-joincommand=$(base64 joincommand.txt | tr -d \\n)
-
-shavalue=$(curl -X GET https://api.github.com/repos/cjmckenna/kubebuilds/contents/joincommand.txt | jq .sha)
-
-if [ -z "$joincommand" ]; then
-  curl -i -X PUT -H "Authorization: token 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" -d "{\"path\": \"joincommand.txt\", \"message\": \"initial commit\", \"content\": \"${content}\"}" https://api.github.com/repos/cjmckenna/kubebuilds/contents/joincommand.txt
-else
-  curl -i -X PUT -H "Authorization: token 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" -d "{\"path\": \"joincommand.txt\", \"message\": \"initial commit\", \"content\": \"${content}\", \"sha\": $shavalue}" https://api.github.com/repos/cjmckenna/kubebuilds/contents/joincommand.txt
-fi
-
-
+bash calicoinstall.sh
+bash metalLBinstall.sh

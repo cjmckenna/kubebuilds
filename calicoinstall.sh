@@ -1,5 +1,6 @@
 #!/bin/bash
 kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
 kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml
-kubectl wait pod --all  --all-namespaces --for=condition=ready
+echo "waiting for all pods to start up"
+kubectl wait pod --all  --all-namespaces --for=condition=ready --timeout=-300s
 echo "Calico install completed"
