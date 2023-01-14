@@ -7,6 +7,7 @@ sudo apt install -y nfs-server
 
 echo "MAKE DIR"
 sudo mkdir /kubedata
+sudo chmod -R 777 /kubedata
 echo "COPYING EXPORTS FILE"
 sudo cp exports /etc/exports
 echo "ENABLE NFS"
