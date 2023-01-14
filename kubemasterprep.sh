@@ -24,7 +24,6 @@ chmod 700 get_helm.sh
 ./get_helm.sh
 echo "UPDATING UBUNTU"
 sudo apt update
-sleep 1m
 echo "UPGRADING UBUNTU AND REBOOTING IF REQUIRED"
 sudo apt -y full-upgrade
 [ -f /var/run/reboot-required ] && sudo reboot -f
