@@ -8,7 +8,7 @@ curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/calicoinstal
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/metalLBinstall.sh && chmod 777 metalLBinstall.sh
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/nfs-prov-install.sh && chmod 777 nfs-prov-install.sh
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/kube-dashboard-install.sh && chmod 777 kube-dashboard-install.sh
-curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/dashboard-admin-account
+curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/dashboard-admin-account.yaml
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/chris_sudo
 echo medic8877 | sudo -S cp chris_sudo /etc/sudoers.d/chris_sudo
 rm chris_sudo
