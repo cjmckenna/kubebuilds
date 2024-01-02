@@ -77,7 +77,7 @@ sudo systemctl enable kubelet
 sudo kubeadm config images pull
 
 sudo kubeadm init \
-  --pod-network-cidr=192.168.100.0/23 \
+  --pod-network-cidr=172.24.0.0/16 \
   --cri-socket unix:///run/containerd/containerd.sock
 
 mkdir -p $HOME/.kube
