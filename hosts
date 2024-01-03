@@ -1,0 +1,13 @@
+127.0.0.1 localhost
+127.0.1.1 kubernetes-master
+10.101.20.20 kubernetes-master
+10.101.20.21 kubernetes-node-01
+10.101.20.22 kubernetes-node-02
+10.101.20.23 kubernetes-node-03
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
