@@ -1,16 +1,7 @@
 #!/bin/bash
 
-# Install kubelet, kubeadm and kubectl
-
-sudo apt -y install curl apt-transport-https
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-sudo apt update
-sudo apt -y install vim git curl wget kubelet kubeadm kubectl
-sudo apt-mark hold kubelet kubeadm kubectl
-
-kubectl version --client && kubeadm version
+# Install required packages
+sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
 
 # Enable kernel modules
 sudo modprobe overlay
@@ -23,38 +14,29 @@ net.bridge.bridge-nf-call-iptables = 1
 net.ipv4.ip_forward = 1
 EOF
 
-# Reload sysctl
-sudo sysctl --system
-
-# Installing Containerd
-
 # Configure persistent loading of modules
-sudo tee /etc/modules-load.d/containerd.conf <<EOF
+sudo tee /etc/modules-load.d/k8s.conf <<EOF
 overlay
 br_netfilter
 EOF
 
-# Load at runtime
-sudo modprobe overlay
-sudo modprobe br_netfilter
-
-# Ensure sysctl params are set
-sudo tee /etc/sysctl.d/kubernetes.conf<<EOF
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-net.ipv4.ip_forward = 1
-EOF
-
-# Reload configs
+# Reload sysctl
 sudo sysctl --system
 
-# Install required packages
-sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl gpg
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+ 
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
 
-# Add Docker repo
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-echo "INSTALLING CONTAINER D"
 # Install containerd
 sudo apt update
 sudo apt install -y containerd.io
@@ -68,6 +50,17 @@ sudo systemctl restart containerd
 sudo systemctl enable containerd
 sudo systemctl status  containerd --no-pager
 echo "CONTAINER D RESTART COMPLETE"
+
+sudo mkdir -p -m 755 /etc/apt/keyrings
+
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt-get update
+sudo apt-get install kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+
 # Initialize master node
 echo "INITIALIZING KUBE MASTER"
 lsmod | grep br_netfilter
@@ -86,5 +79,3 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl cluster-info
 
-# bash calicoinstall.sh
-# bash metalLBinstall.sh
