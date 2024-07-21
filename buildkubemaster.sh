@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Install required packages
-sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
-
 # Enable kernel modules
 sudo modprobe overlay
 sudo modprobe br_netfilter
@@ -23,19 +20,10 @@ EOF
 # Reload sysctl
 sudo sysctl --system
 
-# Add Docker's official GPG key:
-sudo apt-get update
-sudo apt-get install apt-transport-https ca-certificates curl gpg
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
- 
-# Add the repository to Apt sources:
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
+# Install required packages
+sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates gpg
+
+# containerd install section
 
 # Install containerd
 sudo apt update
@@ -51,21 +39,24 @@ sudo systemctl enable containerd
 sudo systemctl status  containerd --no-pager
 echo "CONTAINER D RESTART COMPLETE"
 
-sudo mkdir -p -m 755 /etc/apt/keyrings
+# Create Keyring Directory
+sudo mkdir -p -m 755 /etc/apt/keyring
 
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-
+# Download public signing key
+sudo curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+ 
+# Add the repository to Apt sources:
+# This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 sudo apt-get update
 sudo apt-get -y install kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
+sudo systemctl enable --now kubelet
 
 # Initialize master node
 echo "INITIALIZING KUBE MASTER"
 lsmod | grep br_netfilter
-
-sudo systemctl enable kubelet
 
 sudo kubeadm config images pull
 
