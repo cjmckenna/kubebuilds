@@ -15,8 +15,6 @@ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 sudo apt-get update
 sudo apt -y install vim git curl wget kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
-sudo systemctl enable --now kubelet
-
 
 # Enable kernel modules
 sudo modprobe overlay
@@ -32,35 +30,65 @@ EOF
 # Reload sysctl
 sudo sysctl --system
 
+###############################################################################
+# containerd install section
+###############################################################################
+
 # Configure persistent loading of modules
 sudo tee /etc/modules-load.d/k8s.conf <<EOF
 overlay
 br_netfilter
 EOF
 
-# Install required packages
-sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates gpg
+# Configure persistent loading of modules
+sudo tee /etc/modules-load.d/containerd.conf <<EOF
+overlay
+br_netfilter
+EOF
 
-# containerd install section
+# Load at runtime
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+# Ensure sysctl params are set
+sudo tee /etc/sysctl.d/kubernetes.conf<<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+# Reload configs
+sudo sysctl --system
+
+# Install required packages
+sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+
+# Add Docker repo
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 # Install containerd
 sudo apt update
 sudo apt install -y containerd.io
-echo "CONTAINERD INSTALL COMPLETE"
+
 # Configure containerd and start service
-sudo su -c "mkdir -p /etc/containerd"
-sudo su -c "containerd config default>/etc/containerd/config.toml"
+sudo mkdir -p /etc/containerd
+sudo containerd config default|sudo tee /etc/containerd/config.toml
 
 # restart containerd
 sudo systemctl restart containerd
 sudo systemctl enable containerd
-sudo systemctl status  containerd --no-pager
-echo "CONTAINER D RESTART COMPLETE"
+systemctl status  containerd
 
+###############################################
+# Initialize Cluster
+###############################################
 
-# Initialize master node
 echo "INITIALIZING KUBE MASTER"
+
 lsmod | grep br_netfilter
+
+sudo systemctl enable --now kubelet
 
 sudo kubeadm config images pull
 
@@ -71,6 +99,8 @@ sudo kubeadm init \
 mkdir -p $HOME/.kube
 sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+sleep 20
 
 kubectl cluster-info
 
