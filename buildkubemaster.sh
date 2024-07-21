@@ -1,5 +1,23 @@
 #!/bin/bash
 
+# Create Keyring Directory
+sudo mkdir -p -m 755 /etc/apt/keyrings
+
+sudo apt -y install curl apt-transport-https
+
+# Download public signing key
+sudo curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+ 
+# Add the repository to Apt sources:
+# This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt-get update
+sudo apt -y install vim git curl wget kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+sudo systemctl enable --now kubelet
+
+
 # Enable kernel modules
 sudo modprobe overlay
 sudo modprobe br_netfilter
@@ -11,14 +29,14 @@ net.bridge.bridge-nf-call-iptables = 1
 net.ipv4.ip_forward = 1
 EOF
 
+# Reload sysctl
+sudo sysctl --system
+
 # Configure persistent loading of modules
 sudo tee /etc/modules-load.d/k8s.conf <<EOF
 overlay
 br_netfilter
 EOF
-
-# Reload sysctl
-sudo sysctl --system
 
 # Install required packages
 sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates gpg
@@ -39,20 +57,6 @@ sudo systemctl enable containerd
 sudo systemctl status  containerd --no-pager
 echo "CONTAINER D RESTART COMPLETE"
 
-# Create Keyring Directory
-sudo mkdir -p -m 755 /etc/apt/keyring
-
-# Download public signing key
-sudo curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
- 
-# Add the repository to Apt sources:
-# This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-sudo apt-get update
-sudo apt-get -y install kubelet kubeadm kubectl
-sudo apt-mark hold kubelet kubeadm kubectl
-sudo systemctl enable --now kubelet
 
 # Initialize master node
 echo "INITIALIZING KUBE MASTER"
