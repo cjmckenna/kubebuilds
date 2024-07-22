@@ -35,12 +35,6 @@ sudo sysctl --system
 ###############################################################################
 
 # Configure persistent loading of modules
-sudo tee /etc/modules-load.d/k8s.conf <<EOF
-overlay
-br_netfilter
-EOF
-
-# Configure persistent loading of modules
 sudo tee /etc/modules-load.d/containerd.conf <<EOF
 overlay
 br_netfilter
@@ -74,6 +68,7 @@ sudo apt install -y containerd.io
 # Configure containerd and start service
 sudo mkdir -p /etc/containerd
 sudo containerd config default|sudo tee /etc/containerd/config.toml
+sudo sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
 
 # restart containerd
 sudo systemctl restart containerd
