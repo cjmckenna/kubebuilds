@@ -5,17 +5,23 @@
 
 sudo apt install -y nfs-common
 
-# Install kubelet, kubeadm and kubectl
+#!/bin/bash
+
+# Create Keyring Directory
+sudo mkdir -p -m 755 /etc/apt/keyrings
 
 sudo apt -y install curl apt-transport-https
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-sudo echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-sudo apt update
+# Download public signing key
+sudo curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+ 
+# Add the repository to Apt sources:
+# This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt-get update
 sudo apt -y install vim git curl wget kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
-
-kubectl version --client && kubeadm version
 
 # Enable kernel modules
 sudo modprobe overlay
@@ -31,7 +37,15 @@ EOF
 # Reload sysctl
 sudo sysctl --system
 
-# Installing Containerd
+###############################################################################
+# containerd install section
+###############################################################################
+
+# Configure persistent loading of modules
+sudo tee /etc/modules-load.d/k8s.conf <<EOF
+overlay
+br_netfilter
+EOF
 
 # Configure persistent loading of modules
 sudo tee /etc/modules-load.d/containerd.conf <<EOF
@@ -57,18 +71,18 @@ sudo sysctl --system
 sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
 
 # Add Docker repo
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 # Install containerd
 sudo apt update
 sudo apt install -y containerd.io
 
 # Configure containerd and start service
-sudo su -c "mkdir -p /etc/containerd"
-sudo su -c "containerd config default>/etc/containerd/config.toml"
+sudo mkdir -p /etc/containerd
+sudo containerd config default|sudo tee /etc/containerd/config.toml
 
 # restart containerd
 sudo systemctl restart containerd
 sudo systemctl enable containerd
-sudo systemctl status  containerd --no-pager
+systemctl status  containerd
