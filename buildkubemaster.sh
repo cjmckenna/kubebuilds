@@ -105,7 +105,6 @@ sudo systemctl enable --now kubelet
 sudo kubeadm config images pull
 
 sudo kubeadm init \
-  --control-plane-endpoint=kb1sln-kubecluster-master \
   --pod-network-cidr=172.24.0.0/16 \
   --cri-socket unix:///run/containerd/containerd.sock
 
