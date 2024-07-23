@@ -90,6 +90,7 @@ sudo sed -i 's/            SystemdCgroup = false/            SystemdCgroup = tru
 sudo systemctl restart containerd
 sudo systemctl enable containerd
 systemctl status  containerd
+sudo systemctl restart kubelet.service
 
 ###############################################
 # Initialize Cluster
@@ -120,16 +121,16 @@ kubectl cluster-info
 # Install Flannel Networking
 ############################################################
 
-echo "Installing Flannel"
+# echo "Installing Flannel"
 
 # Needs manual creation of namespace to avoid helm error
-kubectl create ns kube-flannel
-kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged
+# kubectl create ns kube-flannel
+# kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged
 
-helm repo add flannel https://flannel-io.github.io/flannel/
-helm install flannel --set podCidr="172.24.0.0/16" --namespace kube-flannel flannel/flannel
+# helm repo add flannel https://flannel-io.github.io/flannel/
+# helm install flannel --set podCidr="172.24.0.0/16" --namespace kube-flannel flannel/flannel
 
-kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+# kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 
 echo "Kubernetes Master Build Completed"
 
