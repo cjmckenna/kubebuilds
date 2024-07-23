@@ -129,5 +129,7 @@ kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=pri
 helm repo add flannel https://flannel-io.github.io/flannel/
 helm install flannel --set podCidr="172.24.0.0/16" --namespace kube-flannel flannel/flannel
 
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+
 echo "Kubernetes Master Build Completed"
 
