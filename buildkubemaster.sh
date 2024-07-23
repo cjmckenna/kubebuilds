@@ -1,24 +1,38 @@
 #!/bin/bash
 
+echo "Creating keyring directory"
+
 # Create Keyring Directory
 sudo mkdir -p -m 755 /etc/apt/keyrings
 
+echo "Installing curl and apt-transport-https"
+
 sudo apt -y install curl apt-transport-https
+
+echo "Downloading public signing key"
 
 # Download public signing key
 sudo curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
- 
+
+echo "Adding repository to APT sources"
+
 # Add the repository to Apt sources:
 # This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+echo "Installing curl, vim, git, wget, kubeadm, kubectl"
 
 sudo apt-get update
 sudo apt -y install vim git curl wget kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 
+echo "Enabling kernel modules"
+
 # Enable kernel modules
 sudo modprobe overlay
 sudo modprobe br_netfilter
+
+echo "Adding sysctl settings"
 
 # Add some settings to sysctl
 sudo tee /etc/sysctl.d/kubernetes.conf<<EOF
@@ -33,6 +47,8 @@ sudo sysctl --system
 ###############################################################################
 # containerd install section
 ###############################################################################
+
+echo "Installing Containerd"
 
 # Configure persistent loading of modules
 sudo tee /etc/modules-load.d/containerd.conf <<EOF
@@ -99,4 +115,19 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 sleep 20
 
 kubectl cluster-info
+
+############################################################
+# Install Flannel Networking
+############################################################
+
+echo "Installing Flannel"
+
+# Needs manual creation of namespace to avoid helm error
+kubectl create ns kube-flannel
+kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged
+
+helm repo add flannel https://flannel-io.github.io/flannel/
+helm install flannel --set podCidr="172.24.0.0/16" --namespace kube-flannel flannel/flannel
+
+echo "Kubernetes Master Build Completed"
 
