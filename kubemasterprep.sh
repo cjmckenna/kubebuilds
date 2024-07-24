@@ -12,8 +12,11 @@ curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/dashboard-ad
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/tigera-operator.yaml
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/custom-resources.yaml
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/chris_sudo
+curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/hosts
 echo medic8877 | sudo -S cp chris_sudo /etc/sudoers.d/chris_sudo
 rm chris_sudo
+
+sudo cp hosts /etc/hosts
 
 echo "TURNING OFF SWAP"
 # turn off swap
