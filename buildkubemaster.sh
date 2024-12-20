@@ -1,6 +1,25 @@
 #!/bin/bash
 
+# Install NFS server so we can access storage on the SAN
+
+echo "DOWNLOADING"
+curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/exports
+echo "INSTALLING NFS"
+sudo apt install -y nfs-server
+
+echo "MAKE DIR"
+sudo mkdir /kubedata
+sudo chmod -R 777 /kubedata
+echo "COPYING EXPORTS FILE"
+sudo cp exports /etc/exports
+echo "ENABLE NFS"
+sudo systemctl enable --now nfs-server
+echo "EXPORT FS"
+sudo exportfs -ar
+
 echo "Creating keyring directory"
+
+# Meat of the k8s install starts here
 
 # Create Keyring Directory
 sudo mkdir -p -m 755 /etc/apt/keyrings
@@ -75,7 +94,7 @@ sudo apt install -y curl gnupg2 software-properties-common apt-transport-https c
 
 # Add Docker repo
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 # Install containerd
 sudo apt update
