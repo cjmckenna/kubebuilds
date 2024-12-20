@@ -13,7 +13,7 @@ curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/tigera-opera
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/custom-resources.yaml
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/chris_sudo
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/hosts
-echo medic8877 | sudo -S cp chris_sudo /etc/sudoers.d/chris_sudo
+echo Med!ic8877a | sudo -S cp chris_sudo /etc/sudoers.d/chris_sudo
 rm chris_sudo
 
 sudo cp hosts /etc/hosts
