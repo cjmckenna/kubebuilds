@@ -2,6 +2,8 @@
 
 # Install NFS server so we can access storage on the SAN
 
+echo "Running the setup of NFS Server for access to SAN for persistent storage for our pods"
+
 echo "DOWNLOADING"
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/exports
 echo "INSTALLING NFS"
