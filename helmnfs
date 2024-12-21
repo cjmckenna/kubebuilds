@@ -1,5 +1,5 @@
 helm install nfs-subdir-external-provisioner \
 nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
---set nfs.server=192.168.0.203 \
---set nfs.path=/kubedata \
+--set nfs.server=10.101.10.5 \
+--set nfs.path=/kubepvc \
 --set storageClass.onDelete=true
