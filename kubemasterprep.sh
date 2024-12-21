@@ -11,6 +11,7 @@ curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/kube-dashboa
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/dashboard-admin-account.yaml
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/tigera-operator.yaml
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/custom-resources.yaml
+curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/dashboard-secret.yaml
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/chris_sudo
 curl -O https://raw.githubusercontent.com/cjmckenna/kubebuilds/main/hosts
 echo Med!ic8877a | sudo -S cp chris_sudo /etc/sudoers.d/chris_sudo
